@@ -11,20 +11,22 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Route::get('/', function () {
+//     return view('home');
+// });
+
+Route::redirect('/','/home',301);
 
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
 
-Auth::routes();
-
-Route::get('/home', 'HomeController@index')->name('home');
-
-Route::get('/authorize_infusionsoft', 'InfusionsoftController@authorizeInfusionsoft')->name('infusionsoft.authorize');
+// Route::get('/authorize_infusionsoft', 'InfusionsoftController@authorizeInfusionsoft')->name('infusionsoft.authorize');
 
 Route::get('/infusionsoft_test_get_by_email/{email}', 'InfusionsoftController@testInfusionsoftIntegrationGetEmail')->name('api.infusionsoft_test_email');
 Route::get('/infusionsoft_test_add_tag/{contact_id}/{tag_id}', 'InfusionsoftController@testInfusionsoftIntegrationAddTag')->name('api.infusionsoft_test_tag');
 Route::get('/infusionsoft_test_get_all_tags', 'InfusionsoftController@testInfusionsoftIntegrationGetAllTags')->name('api.infusionsoft_test_get_all_tags');
+
+Route::get('/create_test_customers', 'ApiController@exampleCustomer')->name('api.create_test_customers');
+
+Route::get('/api/module_reminder_assigner/{contact_email}', 'ApiController@moduleReminderAssigner')->name('api.module_reminder_assigner');

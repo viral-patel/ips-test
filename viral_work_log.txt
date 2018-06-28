@@ -1,0 +1,89 @@
+- composer install
+
+- Edited .env file for database
+
+- Created DB
+
+- Created DB USER
+
+- Edited hosts file and vhosts file to setup http://ips-test.local/
+
+- Error :: "No application encryption key has been specified."
+- Solution :: 
+$ php artisan key:generate
+Application key [base64:rZeEVYdjJpOMsQ8INQvl5ZIbyHThzjjshpaYbAr9ZzA=] set successfully.
+
+- Run Migration Scripts - Resulted in Error
+$ php artisan migrate
+Error :: Illuminate\Database\QueryException  : SQLSTATE[42000]: Syntax error or access violation: 1071 Specified key was too long; max key length is 767 bytes (SQL: ... )
+
+Solution :: Edited "\app\Providers\AppServiceProvider.php"
+use Illuminate\Support\Facades\Schema;
+...
+public function boot()
+{
+    Schema::defaultStringLength(191);
+}
+
+- Run Migration Scripts - Success
+$ php artisan migrate
+Migration table created successfully.
+Migrating: 2014_10_12_000000_create_users_table
+Migrated:  2014_10_12_000000_create_users_table
+Migrating: 2014_10_12_100000_create_password_resets_table
+Migrated:  2014_10_12_100000_create_password_resets_table
+Migrating: 2018_05_31_140340_create_modules_table
+Migrated:  2018_05_31_140340_create_modules_table
+
+- Run Authorization Script to create oauth token - Resulted in Error 
+cURL error 60: SSL certificate problem: unable to get local issuer certificate (see http://curl.haxx.se/libcurl/c/libcurl-errors.html)
+- Solution : 
+Downloaded "cacert.pem” and Added "curl.cainfo = “certificate path\cacert.pem”
+
+- Run Authorization Script to create oauth token - Success
+
+- Used DB Seeder to fill courses
+$ php composer.phar dump-autoload
+Generating optimized autoload files
+> Illuminate\Foundation\ComposerScripts::postAutoloadDump
+> @php artisan package:discover
+Discovered Package: barryvdh/laravel-ide-helper
+Discovered Package: fideloper/proxy
+Discovered Package: laravel/tinker
+Discovered Package: nunomaduro/collision
+Package manifest generated successfully.
+$ php artisan db:seed
+Seeding: iPSDevTestSeeder
+
+- Run route to get All Tags from InfusionSoft : http://ips-test.local/infusionsoft_test_get_all_tags
+
+- Enabled Route to Create Test Users and Dummy DB entries for Completed Modules for the Users
+Route::get('/create_test_customers', 'ApiController@exampleCustomer')->name('api.create_test_customers');
+
+- Tested New User by /infusionsoft_test_get_by_email/{email}
+
+- Started working on Route::get('/api/module_reminder_assigner/{contact_email}
+
+- Tried out logic as per below piece of code
+
+/*
+// Get list of completed modules for current course
+$completedModulesOfCurrentCourse = $userData->completed_modules()->where('course_key','=',$currentCourse)->orderBy('name')->get(['name']);
+// Get list of all modules for current course
+$moduleListForCurrentCourse = Module::where('course_key','=',$currentCourse)->orderBy('name')->get(['name']);
+// Some how diff both arrays & find all incomplete modules in order & pick first to send reminder 
+// But native laravel functions to work on Eloquent Collections
+
+// Finally after spending much time on above logic, moved to DB query and it worked like a charm in no time
+
+SELECT course_key, name FROM modules WHERE course_key = '<course_key>' and 
+    id NOT IN (
+    SELECT module_id  FROM user_completed_modules WHERE user_id = <user_id>
+    )
+    ORDER BY name ASC LIMIT 1
+
+This will return first incomplete module for each course & Loop will "break" when first incomplete module is found. 
+
+*/
+
+- Writing Test Cases
