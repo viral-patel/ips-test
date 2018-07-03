@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8"/>
+        <title>Test Documentation</title>
+        <style>
+            body {
+                text-rendering: optimizeLegibility;
+                font-variant-ligatures: common-ligatures;
+                font-kerning: normal;
+                margin-left: 2em;
+            }
+
+            body > ul > li {
+                font-family: Source Serif Pro, PT Sans, Trebuchet MS, Helvetica, Arial;
+                font-size: 2em;
+            }
+
+            h2 {
+                font-family: Tahoma, Helvetica, Arial;
+                font-size: 3em;
+            }
+
+            ul {
+                list-style: none;
+                margin-bottom: 1em;
+            }
+        </style>
+    </head>
+    <body>
+        <h2 id="Tests\Feature\iPSTestTest">Feature\iPSTest</h2>
+        <ul>
+            <li style="color: #555753;">✓ Site root test</li>
+            <li style="color: #555753;">✓ Site home test</li>
+            <li style="color: #555753;">✓ Module reminder tag invalid email should fail</li>
+            <li style="color: #555753;">✓ Module reminder tag valid email of invalid customer should fail</li>
+        </ul>
+        <h2 id="Tests\Unit\ExampleTest">Unit\Example</h2>
+        <ul>
+            <li style="color: #555753;">✓ Basic test</li>
+        </ul>
+        <h2 id="Tests\Unit\IpsApiControllerTest">Unit\IpsApiController</h2>
+        <ul>
+            <li style="color: #555753;">✓ Module reminder tag valid customer with no course should fail</li>
+            <li style="color: #555753;">✓ Module reminder tag valid customer with no completed module should succeed</li>
+            <li style="color: #555753;">✓ Module reminder tag valid customer with one completed module should succeed</li>
+            <li style="color: #555753;">✓ Module reminder tag valid customer with completed modules should succeed</li>
+            <li style="color: #555753;">✓ Module reminder tag valid customer with few completed modules should succeed</li>
+            <li style="color: #555753;">✓ Module reminder tag valid customer with two completed courses should succeed</li>
+            <li style="color: #555753;">✓ Module reminder tag valid customer with all modules completed but one should succeed</li>
+            <li style="color: #555753;">✓ Module reminder tag valid customer with all completed modules should succeed</li>
+        </ul>
+    </body>
+</html>
