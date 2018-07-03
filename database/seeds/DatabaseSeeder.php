@@ -11,7 +11,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        //  $this->call(iPSDevTestSeeder::class);
-        //  $this->call(iPSModuleReminderTagsSeeder::class);
+        // $this->call(iPSModulesSeeder::class);
+        // $this->call(iPSModuleReminderTagsSeeder::class);
     }
 }

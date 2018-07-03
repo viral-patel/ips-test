@@ -16,8 +16,8 @@ class CreateModuleReminderTagsTable extends Migration
         Schema::create('module_reminder_tags', function (Blueprint $table) {
             $table->integer('id')->unsigned();
             $table->string('name');
-            $table->string('desription');
-            $table->string('category');
+            $table->string('description')->nullable();
+            $table->string('category')->nullable();
             $table->timestamps();
         });
     }

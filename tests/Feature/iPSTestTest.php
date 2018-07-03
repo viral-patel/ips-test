@@ -3,12 +3,21 @@
 namespace Tests\Feature;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithoutMiddleWare;
-use Illuminate\Foundation\Facade\Bus;
+use Illuminate\Foundation\Facades\Bus;
+use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use \Mockery;
 
 class iPSTestTest extends TestCase
 {
+    use MockeryPHPUnitIntegration;
+
+    public $infusionsoftHelperMock;
+
+    public function tearDown() {
+        \Mockery::close();
+    }
+
     /**
      * A basic test example.
      *
@@ -22,32 +31,30 @@ class iPSTestTest extends TestCase
     public function testSiteHomeTest()
     {
         $response = $this->get('/home');
-        $response->assertStatus(200);
+        $response->assertRedirect('/login');
     }
-
-    public function testModuleReminderTagInvalidEmail() {
-        $response = $this->withHeaders([
-                'X-Header'=>'Value',
-            ])->json('GET', '/api/module_reminder_assigner/foo');
+    
+    // Invalid Email
+    public function testModuleReminderTagInvalidEmailShouldFail() {
+        $response = $this->json('GET', '/api/module_reminder_assigner/foo');
 
         $response
-            ->assertStatus(200)
+            ->assertStatus(500)
             ->assertJson([
                 'success'=>false,
+                'message'=> __('ipsapi.invalid_email')
             ]);
     }
-
-    public function testModuleReminderTagValidEmail() {
-        $response = $this->withHeaders([
-                'X-Header'=>'Value',
-            ])->json('GET', '/api/module_reminder_assigner/foo@bar.com');
+    
+    // Valid Email, Invalid User
+    public function testModuleReminderTagValidEmailOfInvalidCustomerShouldFail() {
+        $response = $this->json('GET', '/api/module_reminder_assigner/foo@bar.com');
 
         $response
-            ->assertStatus(200)
+            ->assertStatus(500)
             ->assertJson([
-                'success'=>true,
+                'success'=>false,
+                'message'=>__('ipsapi.invalid_user_email')
             ]);
     }
-
-
 }

@@ -28,5 +28,3 @@ Route::get('/infusionsoft_test_add_tag/{contact_id}/{tag_id}', 'InfusionsoftCont
 Route::get('/infusionsoft_test_get_all_tags', 'InfusionsoftController@testInfusionsoftIntegrationGetAllTags')->name('api.infusionsoft_test_get_all_tags');
 
 Route::get('/create_test_customers', 'ApiController@exampleCustomer')->name('api.create_test_customers');
-
-Route::get('/api/module_reminder_assigner/{contact_email}', 'ApiController@moduleReminderAssigner')->name('api.module_reminder_assigner');

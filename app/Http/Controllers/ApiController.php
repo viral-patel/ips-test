@@ -14,6 +14,12 @@ use Log;
 
 class ApiController extends Controller
 {
+    public $infusionsoftHelper;
+
+    public function __construct(InfusionsoftHelper $infusionsoftHelper) {
+        $this->infusionsoftHelper = $infusionsoftHelper;
+    }
+
     /**
      * Checks if input parameter is a valid email
      * @param string $email
@@ -21,25 +27,24 @@ class ApiController extends Controller
     private function validateInputEmail($email) {
         $validator = Validator::make( array( 'email' => $email ), array( 'email' => 'required|email' ));
         if( $validator->fails() ) {
-            throw new \Exception("Input is an invalid email.");
+            throw new \Exception(__('ipsapi.invalid_email'));
         }
     }
 
     private function getUserDetailsByEmail($email) {
-        $infusionsoft = new InfusionsoftHelper();
-        $userDetails = $infusionsoft->getContact($email);
+        $userDetails = $this->infusionsoftHelper->getContact($email);
         return $userDetails;
     }
 
     private function validateUserDetails($userDetails) {
         if( $userDetails === false ) {
-            throw new \Exception("No user with given email.");
+            throw new \Exception(__('ipsapi.invalid_user_email'));
         }
     }
 
     private function checkIfUserBoughtProducts($userDetails) {
         if( empty($userDetails['_Products']) ) {
-            throw new \Exception("User has not bought any course.");
+            throw new \Exception(__('ipsapi.not_bought_any_course'));
         }
     }
 
@@ -50,20 +55,19 @@ class ApiController extends Controller
     private function getUserDetailsByEmailFromDatabase($email) {
         return User::where('email', '=', $email)->get()[0];
     }
-            
+
     private function getTagDetailsByTagName($tagName) {
         return ModuleReminderTag::where('name', '=', $tagName)->get()[0]->toArray();
     }
 
     /**
      * Add Module Reminder Tag to InfusionSoft
-     * 
+     *
      */
     private function saveTagIdForUser($userId,$tagId) {
-        $infusionsoft = new InfusionsoftHelper();
-        $userAddTagResult = $infusionsoft->addTag($userId,$tagId);
+        $userAddTagResult = $this->infusionsoftHelper->addTag($userId,$tagId);
         if( $userAddTagResult === false ) {
-            throw new \Exception("Error saving tag id for user.");
+            throw new \Exception(__('ipsapi.error_saving_tag_id'));
         }
     }
 
@@ -74,7 +78,7 @@ class ApiController extends Controller
      *      'success' : true/false,
      *      'message' : "success/error message"
      * }
-     * 
+     *
      * @param string $email
      * @return void
      */
@@ -83,9 +87,9 @@ class ApiController extends Controller
         try {
             //Variable Initialization
             $success = true;
-            $message = 'Module reminder tag added.';
-            $reminderModuleName = ''; 
-            
+            $message = __('ipsapi.module_reminders_completed');
+            $reminderModuleName = '';
+
             // Check for valid email
             $this->validateInputEmail($email);
 
@@ -107,7 +111,7 @@ class ApiController extends Controller
 
             // Find Next Incomplete Module For Reminder
             foreach($userCourses as $currentCourse) {
-                $firstModuleToTag = DB::select("SELECT course_key, name FROM modules WHERE course_key = '{$currentCourse}' and 
+                $firstModuleToTag = DB::select("SELECT course_key, name FROM modules WHERE course_key = '{$currentCourse}' and
                                                 id NOT IN (
                                                     SELECT module_id  FROM user_completed_modules WHERE user_id = {$userData->id}
                                                     )
@@ -120,9 +124,10 @@ class ApiController extends Controller
 
             // Build Module Reminder Tag
             if(strlen($reminderModuleName) == 0 ) {
-                $moduleReminderTag = "Module reminders completed";
+                $moduleReminderTag = __('ipsapi.module_reminders_completed');
             } else {
-                $moduleReminderTag = "Start {$reminderModuleName} Reminders";
+                // $moduleReminderTag = "Start {$reminderModuleName} Reminders";
+                $moduleReminderTag = __('ipsapi.module_reminder_start',['module_name'=> $reminderModuleName]);
             }
 
             // Get TagId to Save
@@ -132,23 +137,22 @@ class ApiController extends Controller
             $this->saveTagIdForUser($userDetails['Id'],$tagDetails['id']);
 
             // Log Output Data
-            $logString = $userDetails['Id'] ."," . $email . "," . $tagDetails['id'] . "," . $moduleReminderTag; 
+            $logString = $userDetails['Id'] ."," . $email . "," . $tagDetails['id'] . "," . $moduleReminderTag;
             Log::info($logString);
-
             // Return Success
             $success = true;
-            $message = "Module reminder tag added.";
+            $message = (strlen($reminderModuleName) == 0 ) ? $message : __('ipsapi.module_reminder_tag_added');
         } catch( \Exception $e ) {
             $success = false;
             $message = $e->getMessage();
             // Log Error Data
-            $logString = $email . "," . $message; 
+            $logString = $email . "," . $message;
             Log::error($logString);
         }
         $returnArr['success'] = $success;
         $returnArr['message'] = $message;
-
-        return Response::json($returnArr);
+        $responseCode = ($success===true)?200:500;
+        return Response::make($returnArr,$responseCode);
     }
 
     /**
